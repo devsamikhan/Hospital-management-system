@@ -457,6 +457,6 @@ Distributed under the **Apache 2.0 License**. See [`LICENSE`](LICENSE) for full 
 
 **Built with ❤️ for modern Pakistani healthcare institutions**
 
-*St. Jude Hospital Management System — Engineered for clinical excellence*
+*St. Jude Hospital Management System — Engineered by Sami Ullah Khan*
 
 </div>
