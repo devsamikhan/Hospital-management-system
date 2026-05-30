@@ -1,4 +1,4 @@
-// api/index.ts
+// src/server/api_entry.ts
 import express from "express";
 import crypto8 from "crypto";
 
@@ -2796,7 +2796,7 @@ dashboardRouter.get("/stats", authenticateToken, async (req, res) => {
   }
 });
 
-// api/index.ts
+// src/server/api_entry.ts
 var JWT_SECRET2 = process.env.JWT_SECRET || "hospital-management-secret-key-2026-secure";
 function hashPassword3(password) {
   return crypto8.createHash("sha256").update(password).digest("hex");
@@ -2875,9 +2875,14 @@ async function seedDatabaseIfEmpty() {
 }
 var app = express();
 app.use((req, res, next) => {
+  const originalUrl = req.headers["x-vercel-forwarded-path"] || req.headers["x-matched-path"] || req.url;
+  if (originalUrl) {
+    req.url = originalUrl;
+  }
   if (!req.url.startsWith("/api")) {
     req.url = "/api" + (req.url.startsWith("/") ? "" : "/") + req.url;
   }
+  console.log(`[PATH ADJUSTED]: Final mapped request URL inside Express is: ${req.url}`);
   next();
 });
 app.use((req, res, next) => {
@@ -2920,9 +2925,9 @@ app.use((err, req, res, next) => {
     hint: "Please ensure that your Firebase environment variables (FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY or FIREBASE_SERVICE_ACCOUNT) are configured correctly in the Vercel dashboard."
   });
 });
-var index_default = app;
+var api_entry_default = app;
 export {
-  index_default as default
+  api_entry_default as default
 };
 /**
  * @license

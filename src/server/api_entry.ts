@@ -11,21 +11,21 @@
 import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import crypto from 'crypto';
-import { dbService, db } from '../src/server/db';
+import { dbService, db } from './db';
 
 // Import modular micro-service routers
-import { authRouter } from '../src/server/routes/auth.routes';
-import { patientRouter } from '../src/server/routes/patient.routes';
-import { appointmentRouter } from '../src/server/routes/appointment.routes';
-import { clinicalRouter } from '../src/server/routes/clinical.routes';
-import { labRouter } from '../src/server/routes/lab.routes';
-import { pharmacyRouter } from '../src/server/routes/pharmacy.routes';
-import { inpatientRouter } from '../src/server/routes/inpatient.routes';
-import { billingRouter } from '../src/server/routes/billing.routes';
-import { auditRouter } from '../src/server/routes/audit.routes';
-import { settingsRouter } from '../src/server/routes/settings.routes';
-import { doctorRouter } from '../src/server/routes/doctor.routes';
-import { dashboardRouter } from '../src/server/routes/dashboard.routes';
+import { authRouter } from './routes/auth.routes';
+import { patientRouter } from './routes/patient.routes';
+import { appointmentRouter } from './routes/appointment.routes';
+import { clinicalRouter } from './routes/clinical.routes';
+import { labRouter } from './routes/lab.routes';
+import { pharmacyRouter } from './routes/pharmacy.routes';
+import { inpatientRouter } from './routes/inpatient.routes';
+import { billingRouter } from './routes/billing.routes';
+import { auditRouter } from './routes/audit.routes';
+import { settingsRouter } from './routes/settings.routes';
+import { doctorRouter } from './routes/doctor.routes';
+import { dashboardRouter } from './routes/dashboard.routes';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'hospital-management-secret-key-2026-secure';
 
@@ -109,11 +109,22 @@ async function seedDatabaseIfEmpty() {
 // Create Express app
 const app = express();
 
-// Normalize req.url to always start with /api in Vercel serverless environment
+// Automatically adjust req.url dynamically from Vercel routing headers to guarantee 100% route matching
 app.use((req: Request, res: Response, next: NextFunction) => {
+  const originalUrl = (req.headers['x-vercel-forwarded-path'] as string) || 
+                      (req.headers['x-matched-path'] as string) || 
+                      req.url;
+
+  if (originalUrl) {
+    req.url = originalUrl;
+  }
+
+  // Normalize to always start with /api prefix
   if (!req.url.startsWith('/api')) {
     req.url = '/api' + (req.url.startsWith('/') ? '' : '/') + req.url;
   }
+
+  console.log(`[PATH ADJUSTED]: Final mapped request URL inside Express is: ${req.url}`);
   next();
 });
 
