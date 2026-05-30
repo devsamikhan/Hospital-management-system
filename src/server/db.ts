@@ -16,24 +16,40 @@ function hashPassword(password: string): string {
 
 const databaseURL = "https://hospital-managemnt-syste-ece35-default-rtdb.firebaseio.com";
 
+function cleanEnvVar(val: string | undefined): string {
+  if (!val) return '';
+  let cleaned = val.trim();
+  if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
+    cleaned = cleaned.slice(1, -1);
+  }
+  if (cleaned.startsWith("'") && cleaned.endsWith("'")) {
+    cleaned = cleaned.slice(1, -1);
+  }
+  return cleaned.trim();
+}
+
 // Initialize Firebase Admin SDK using secure production environment variables
 if (admin.apps.length === 0) {
   let credentialObj: any = null;
   
-  if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
-    let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+  const projectId = cleanEnvVar(process.env.FIREBASE_PROJECT_ID);
+  const clientEmail = cleanEnvVar(process.env.FIREBASE_CLIENT_EMAIL);
+  let privateKey = cleanEnvVar(process.env.FIREBASE_PRIVATE_KEY);
+  
+  if (projectId && clientEmail && privateKey) {
     // Replace escaped newlines with actual newline characters to prevent parsing errors on Vercel
     privateKey = privateKey.replace(/\\n/g, '\n');
     
     credentialObj = admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: privateKey
+      projectId,
+      clientEmail,
+      privateKey
     });
     console.log("Firebase Admin SDK successfully initialized using separate environment variables.");
   } else if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     try {
-      const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+      const saString = cleanEnvVar(process.env.FIREBASE_SERVICE_ACCOUNT);
+      const sa = JSON.parse(saString);
       if (sa.private_key) {
         sa.private_key = sa.private_key.replace(/\\n/g, '\n');
       }
