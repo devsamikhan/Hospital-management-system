@@ -5,6 +5,7 @@
  * Vercel Serverless Function Entry Point
  * Wraps the Express app for Vercel's serverless runtime.
  * All /api/* requests are routed here by vercel.json rewrites.
+ * Trigger: Force Vercel redeploy to apply newly configured environment variables.
  */
 
 import express, { Request, Response, NextFunction } from 'express';
