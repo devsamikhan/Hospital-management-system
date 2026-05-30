@@ -61,19 +61,55 @@ if (admin.apps.length === 0) {
   }
   
   if (credentialObj) {
-    admin.initializeApp({
-      credential: credentialObj,
-      databaseURL
-    });
+    try {
+      admin.initializeApp({
+        credential: credentialObj,
+        databaseURL
+      });
+      console.log("Firebase Admin SDK successfully initialized using separate environment variables.");
+    } catch (e) {
+      console.error("Firebase Admin SDK failed to initialize with credentials:", e);
+    }
+  } else if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    try {
+      const saString = cleanEnvVar(process.env.FIREBASE_SERVICE_ACCOUNT);
+      const sa = JSON.parse(saString);
+      if (sa.private_key) {
+        sa.private_key = sa.private_key.replace(/\\n/g, '\n');
+      }
+      admin.initializeApp({
+        credential: admin.credential.cert(sa),
+        databaseURL
+      });
+      console.log("Firebase Admin SDK successfully initialized using FIREBASE_SERVICE_ACCOUNT environment variable.");
+    } catch (e) {
+      console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT environment variable.", e);
+    }
   } else {
-    // Local fallback using application default credentials or blank parameters
-    admin.initializeApp({ databaseURL });
-    console.log("Firebase Admin SDK initialized using fallback application credentials.");
+    try {
+      // Local fallback using application default credentials or blank parameters
+      admin.initializeApp({ databaseURL });
+      console.log("Firebase Admin SDK initialized using fallback application credentials.");
+    } catch (e) {
+      console.error("Firebase Admin SDK failed to initialize with ADC fallback:", e);
+    }
   }
 }
 
 // Global Firestore Client Singleton instance
-export const db = admin.firestore();
+let dbInstance: admin.firestore.Firestore;
+try {
+  if (admin.apps.length > 0) {
+    dbInstance = admin.firestore();
+  } else {
+    console.warn("No initialized Firebase apps found. Firestore will be unavailable.");
+    dbInstance = null as any;
+  }
+} catch (e) {
+  console.error("Firestore initialization failed. Database will not be accessible:", e);
+  dbInstance = null as any;
+}
+export const db = dbInstance;
 
 /**
  * dbService Abstraction Wrappers mapping NoSQL collections to TypeScript models
@@ -84,6 +120,9 @@ export const dbService = {
   async seedDatabaseIfVacant() {
     try {
       console.log("[SEEDING] Performing defensive initialization check...");
+      if (!db) {
+        throw new Error("Firestore client is not initialized. Please configure your Firebase environment variables on Vercel.");
+      }
       
       // Explicit baseline check to prevent database duplication and network bandwidth consumption
       const usersSnapshot = await db.collection('users').limit(1).get();
