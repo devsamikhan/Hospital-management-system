@@ -34,6 +34,10 @@ function hashPassword(password: string): string {
 }
 
 async function seedDatabaseIfEmpty() {
+  if (!db) {
+    console.warn("[SEED] Seeding skipped: Firestore client is null.");
+    return;
+  }
   try {
     const usersSnapshot = await db.collection('users').limit(1).get();
     if (usersSnapshot.empty) {
@@ -148,7 +152,11 @@ app.get('/api/health', (_req: Request, res: Response) => {
 });
 
 // Seed on cold start (Vercel serverless cold boot)
-seedDatabaseIfEmpty();
+try {
+  seedDatabaseIfEmpty();
+} catch (e) {
+  console.error("Failed to trigger database seeding on cold boot:", e);
+}
 
 // Global error handling middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
