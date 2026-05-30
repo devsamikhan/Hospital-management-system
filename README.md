@@ -14,7 +14,7 @@
 
 > A state-of-the-art, fully-typed, cloud-native clinical operations platform engineered for modern Pakistani medical institutions. Architected on a **decoupled micro-service routing framework** with an immersive glassmorphic UI, deep **PKR (Rs.)** localization, and HIPAA-aligned security controls — deployable to Vercel serverless infrastructure in a single command.
 
-🔗 **Live Demo:** [https://st-jude-hms.vercel.app](https://st-jude-hms.vercel.app)
+🔗 **Live Demo:** [https://hospital-management-system-sigma-dusky.vercel.app/](https://hospital-management-system-sigma-dusky.vercel.app/)
 📁 **Repository:** [github.com/devsamikhan/Hospital-management-system](https://github.com/devsamikhan/Hospital-management-system)
 
 </div>
