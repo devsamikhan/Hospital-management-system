@@ -7,4 +7,5 @@ coverage/
 .env*
 !.env.example
 firebase-service-account.json
+api/index.js
 scratch/
