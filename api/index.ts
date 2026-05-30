@@ -149,4 +149,14 @@ app.get('/api/health', (_req: Request, res: Response) => {
 // Seed on cold start (Vercel serverless cold boot)
 seedDatabaseIfEmpty();
 
+// Global error handling middleware
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error('[GLOBAL ERROR HANDLER]:', err);
+  res.status(500).json({
+    message: 'Internal Server Error',
+    error: err.message || String(err),
+    hint: 'Please ensure that your Firebase environment variables (FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY or FIREBASE_SERVICE_ACCOUNT) are configured correctly in the Vercel dashboard.'
+  });
+});
+
 export default app;
