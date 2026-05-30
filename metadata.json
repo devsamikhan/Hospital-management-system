@@ -1,0 +1,6 @@
+{
+  "name": "Hospital Management System",
+  "description": "A comprehensive Hospital Management System (HMS) tailored for a mid-sized clinic or hospital. Streamlines clinical records (EMR, SOAP notes, e-prescriptions), administrative bookings, staff rosters, IPD inpatient beds, laboratory ordering, pharmacy inventory, and medical billing with audit trails.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
