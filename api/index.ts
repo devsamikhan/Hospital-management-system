@@ -104,6 +104,14 @@ async function seedDatabaseIfEmpty() {
 // Create Express app
 const app = express();
 
+// Normalize req.url to always start with /api in Vercel serverless environment
+app.use((req: Request, res: Response, next: NextFunction) => {
+  if (!req.url.startsWith('/api')) {
+    req.url = '/api' + (req.url.startsWith('/') ? '' : '/') + req.url;
+  }
+  next();
+});
+
 // CORS headers for Vercel serverless
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.header('Access-Control-Allow-Origin', '*');
